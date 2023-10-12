@@ -5,13 +5,13 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.time.LocalDate;
-import java.util.Date;
+
 
 @Slf4j
 public class FilmValidator {
 
-     public static void validate(Film film){
-         LocalDate date = LocalDate.of(1895,12,28);
+    public static void validate(Film film) {
+        LocalDate date = LocalDate.of(1895, 12, 28);
 
         if (film.getReleaseDate().isBefore(date)) {
             log.error("неправильная дата фильма " + film.getId());
@@ -21,13 +21,13 @@ public class FilmValidator {
             log.error("неправильное имя фильма " + film.getId());
             throw new ValidationException(" Пустое имя фильма ");
         }
-         if (film.getDescription().length()>200) {
-             log.error("неправильное описание фильма " + film.getId());
-             throw new ValidationException(" больше 200 ");
-         }
-         if (film.getDuration()<0) {
-             log.error("отрицательное время фильма " + film.getId());
-             throw new ValidationException(" минус ");
-         }
-     }
+        if (film.getDescription().length() > 200) {
+            log.error("неправильное описание фильма " + film.getId());
+            throw new ValidationException(" больше 200 ");
+        }
+        if (film.getDuration() < 0) {
+            log.error("отрицательное время фильма " + film.getId());
+            throw new ValidationException(" минус ");
+        }
+    }
 }
