@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Slf4j
 public class FilmValidator {
 
-    public static void validate(Film film) {
+    public void validate(Film film) {
         LocalDate date = LocalDate.of(1895, 12, 28);
 
         if (film.getReleaseDate().isBefore(date)) {
@@ -28,6 +28,10 @@ public class FilmValidator {
         if (film.getDuration() < 0) {
             log.error("отрицательное время фильма " + film.getId());
             throw new ValidationException(" минус ");
+        }
+        if (film.getId() == 0) {
+            log.error(" id фильма 0 " + film.getId());
+            throw new ValidationException(" id 0");
         }
     }
 }

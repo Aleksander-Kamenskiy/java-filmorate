@@ -5,20 +5,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
+    private final LinkedHashMap<Integer, User> users = new LinkedHashMap<>();
     private int nextId = 1;
+    UserValidator validator = new UserValidator();
 
     @GetMapping("/users")
     public Collection<User> getAll() {
@@ -26,10 +25,10 @@ public class UserController {
     }
 
     @PostMapping(value = "/users")
-    public User create(@RequestBody User user) throws ValidationException {
-        UserValidator.validate(user);
-        checkUserName(user);
+    public User create(@RequestBody User user) {
+        setUserName(user);
         user.setId(nextId);
+        validator.validate(user);
         nextId += 1;
         users.put(user.getId(), user);
         log.info("создан пользователь " + user.getId());
@@ -37,9 +36,9 @@ public class UserController {
     }
 
     @PutMapping(value = "/users")
-    public User update(@RequestBody User user) throws ValidationException, NotFoundException {
-        UserValidator.validate(user);
-        checkUserName(user);
+    public User update(@RequestBody User user) {
+        validator.validate(user);
+        setUserName(user);
         if (!users.containsKey(user.getId())) {
             throw new NotFoundException("Ошибка");
         }
@@ -48,7 +47,7 @@ public class UserController {
         return user;
     }
 
-    public void checkUserName(User user) {
+    private void setUserName(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }

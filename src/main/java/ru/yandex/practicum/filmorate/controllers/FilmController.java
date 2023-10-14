@@ -4,25 +4,24 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 @Slf4j
 @RestController
 @RequiredArgsConstructor
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final LinkedHashMap<Integer, Film> films = new LinkedHashMap<>();
     private int nextId = 1;
+    FilmValidator validator = new FilmValidator();
 
     @PostMapping(value = "/films")
-    public Film create(@RequestBody Film film) throws ValidationException {
-        FilmValidator.validate(film);
+    public Film create(@RequestBody Film film) {
         film.setId(nextId);
+        validator.validate(film);
         nextId += 1;
         films.put(film.getId(), film);
         log.info("создан фильм " + film.getId());
@@ -30,8 +29,8 @@ public class FilmController {
     }
 
     @PutMapping(value = "/films")
-    public Film update(@RequestBody Film film) throws ValidationException, NotFoundException {
-        FilmValidator.validate(film);
+    public Film update(@RequestBody Film film) {
+        validator.validate(film);
         if (!films.containsKey(film.getId())) {
             throw new NotFoundException("Ошибка");
         }
