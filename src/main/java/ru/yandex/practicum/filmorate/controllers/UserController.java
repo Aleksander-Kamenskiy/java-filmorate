@@ -37,7 +37,7 @@ public class UserController {
 
     @PutMapping(value = "/users")
     public User update(@RequestBody User user) {
-        validator.validate(user);
+        validator.validateUpdate(user);
         setUserName(user);
         if (!users.containsKey(user.getId())) {
             throw new NotFoundException("Ошибка");

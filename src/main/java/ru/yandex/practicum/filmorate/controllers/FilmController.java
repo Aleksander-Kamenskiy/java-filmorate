@@ -30,7 +30,7 @@ public class FilmController {
 
     @PutMapping(value = "/films")
     public Film update(@RequestBody Film film) {
-        validator.validate(film);
+        validator.validateUpdate(film);
         if (!films.containsKey(film.getId())) {
             throw new NotFoundException("Ошибка");
         }

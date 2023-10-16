@@ -12,7 +12,7 @@ import java.time.LocalDate;
 
 @Data
 public class User {
-    private int id;
+    private Integer id;
     @Email
     @NotEmpty
     private String email;

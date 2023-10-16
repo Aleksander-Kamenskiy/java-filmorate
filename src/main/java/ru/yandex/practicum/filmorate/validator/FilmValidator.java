@@ -29,9 +29,13 @@ public class FilmValidator {
             log.error("отрицательное время фильма " + film.getId());
             throw new ValidationException(" минус ");
         }
-        if (film.getId() == 0) {
-            log.error(" id фильма 0 " + film.getId());
-            throw new ValidationException(" id 0");
+    }
+
+    public void validateUpdate(Film film) {
+        validate(film);
+        if (film.getId() == null) {
+            log.error(" id фильма null " + film.getId());
+            throw new ValidationException(" id null");
         }
     }
 }

@@ -25,9 +25,13 @@ public class UserValidator {
             log.error("почта без @ " + user.getId());
             throw new ValidationException("почта");
         }
-        if (user.getId() == 0) {
-            log.error(" id пользователя 0 " + user.getId());
-            throw new ValidationException(" id 0");
+    }
+
+    public void validateUpdate(User user) {
+        validate(user);
+        if (user.getId() == null) {
+            log.error(" id пользователя null " + user.getId());
+            throw new ValidationException(" id null");
         }
     }
 }
