@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
+import java.util.List;
 
 
 @Slf4j
@@ -27,41 +28,63 @@ public class UserController {
 
     @GetMapping("/users")
     public Collection<User> getAll() {
-        return userService.getAll();
+        log.info("Получение пользователей");
+        Collection<User> getAllUser = userService.getAll();
+        log.info("Пользователи получены");
+        return getAllUser;
     }
 
     @PostMapping(value = "/users")
     public User create(@RequestBody User user) {
-        return userService.create(user);
+        log.info("Создание пользователя");
+        User userCreate = userService.create(user);
+        log.info("Пользователь создан");
+        return userCreate;
     }
 
     @PutMapping(value = "/users")
     public User update(@RequestBody User user) {
-        return userService.update(user);
+        log.info("Обновление пользователя");
+        User updateUser = userService.update(user);
+        log.info("Пользователь обновлен");
+        return updateUser;
     }
 
     @GetMapping(value = "/users/{id}")
     public User getUser(@PathVariable Integer id) {
-        return userService.getUser(id);
+        log.info("Получение пользователя");
+        User getUser1 = userService.getUser(id);
+        log.info("Пользователь получен");
+        return getUser1;
     }
 
     @PutMapping(value = "/users/{id}/friends/{friendId}")
     public void addFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.info("Добавление друга");
         userService.addFriends(id, friendId);
+        log.info("Друг добавлен");
     }
 
     @DeleteMapping(value = "/users/{id}/friends/{friendId}")
     public void deleteFriend(@PathVariable Integer id, @PathVariable Integer friendId) {
+        log.info("Удаление друга");
         userService.deleteFriends(id, friendId);
+        log.info("Друг удален");
     }
 
     @GetMapping(value = "/users/{id}/friends")
     public Collection<User> getFriends(@PathVariable Integer id) {
-        return userService.findAllFriends(id);
+        log.info("Получение друзей");
+        List<User> getFriends1 = userService.findAllFriends(id);
+        log.info("Друзья получены");
+        return getFriends1;
     }
 
     @GetMapping(value = "/users/{id}/friends/common/{otherId}")
     public Collection<User> getCommonFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
-        return userService.findCommonFriends(id, otherId);
+        log.info("Получение общих друзей");
+        List<User> commonFriends = userService.findCommonFriends(id, otherId);
+        log.info("Общие друзья получены");
+        return commonFriends;
     }
 }

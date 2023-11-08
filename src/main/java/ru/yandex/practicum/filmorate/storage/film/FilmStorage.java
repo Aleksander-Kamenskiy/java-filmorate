@@ -6,13 +6,15 @@ import ru.yandex.practicum.filmorate.model.Film;
 import java.util.List;
 
 public interface FilmStorage {
-    Film addFilm(Film film);
+    Film add(Film film);
 
-    void deleteFilm(Integer idFilm);
+    void delete(Integer idFilm);
 
-    Film changeFilm(Film film);
+    Film update(Film film);
 
-    List<Film> getAllFilms();
+    List<Film> getAll();
 
-    Film findFilmById(int idFilm);
+    Film findById(int idFilm);
+
+    List<Film> bestByLike(Integer count);
 }
