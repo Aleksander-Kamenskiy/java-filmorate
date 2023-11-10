@@ -10,4 +10,8 @@ public class ErrorResponse {
         this.message = message;
         this.stackTrace = stackTrace;
     }
+
+    public ErrorResponse(String message) {
+        this.message = message;
+    }
 }

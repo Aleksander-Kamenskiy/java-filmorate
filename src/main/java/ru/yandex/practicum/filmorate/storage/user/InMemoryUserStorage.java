@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,5 +48,40 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Такого пользователя нет");
         }
         return users.get(id);
+    }
+
+    public void addFriends(int idUser, int idFriends) {
+        User user = findById(idUser);
+        User friend = findById(idFriends);
+        user.getFriends().add(idFriends);
+        friend.getFriends().add(idUser);
+    }
+
+    public void deleteFriends(int idUser, int idFriends) {
+        findById(idUser).getFriends().remove(idFriends);
+        findById(idFriends).getFriends().remove(idUser);
+    }
+
+    public List<User> findAllFriends(Integer idUser) {
+        List<User> friends = new ArrayList<>();
+        User user = findById(idUser);
+        if (user.getFriends() != null) {
+            for (Integer id : user.getFriends()) {
+                friends.add(findById(id));
+            }
+        }
+        return friends;
+    }
+
+    public List<User> findCommonFriends(int idUser, int idOther) {
+        List<User> commonFriends = new ArrayList<>();
+        User user = findById(idUser);
+        User otherUser = findById(idOther);
+        for (Integer friend : user.getFriends()) {
+            if (otherUser.getFriends().contains(friend)) {
+                commonFriends.add(findById(friend));
+            }
+        }
+        return commonFriends;
     }
 }

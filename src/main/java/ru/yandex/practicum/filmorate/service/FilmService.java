@@ -31,6 +31,10 @@ public class FilmService {
     }
 
     public Film update(Film film) {
+        Film savedFilm = filmStorage.findById(film.getId());
+        if (savedFilm == null) {
+            throw new NotFoundException(String.format("Нет фильма с id %s", savedFilm.getId()));
+        }
         validator.validateUpdate(film);
         return filmStorage.update(film);
     }

@@ -25,28 +25,28 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleConstraintViolationException(final ConstraintViolationException e) {
-        log.error("ConstraintViolationException: message {}/n stackTrace: {}", e.getMessage(), e.getStackTrace());
-        return new ErrorResponse(e.getMessage(), getStackTrace(e));
+        log.error("ConstraintViolationException: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
-        log.error("ValidationException: message {}/n stackTrace: {}", e.getMessage(), e.getStackTrace());
-        return new ErrorResponse(e.getMessage(), getStackTrace(e));
+        log.error("ValidationException: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleObjectDoesNotExistException(final NotFoundException e) {
-        log.error("ObjectDoesNotExistException: message {}/n stackTrace: {}", e.getMessage(), e.getStackTrace());
-        return new ErrorResponse(e.getMessage(), getStackTrace(e));
+        log.error("ObjectDoesNotExistException: {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Exception e) {
-        log.error("Throwable: message {}/n stackTrace: {}", e.getMessage(), e.getStackTrace());
+        log.error("Throwable: {}", e);
         return new ErrorResponse(e.getMessage(), getStackTrace(e));
     }
 }

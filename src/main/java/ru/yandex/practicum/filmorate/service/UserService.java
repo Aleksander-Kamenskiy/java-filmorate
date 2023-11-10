@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -45,38 +44,19 @@ public class UserService {
     }
 
     public void addFriends(int idUser, int idFriends) {
-        User user = findUserById(idUser);
-        User friend = findUserById(idFriends);
-        user.getFriends().add(idFriends);
-        friend.getFriends().add(idUser);
+        userStorage.addFriends(idUser, idFriends);
     }
 
     public void deleteFriends(int idUser, int idFriends) {
-        findUserById(idUser).getFriends().remove(idFriends);
-        findUserById(idFriends).getFriends().remove(idUser);
+        userStorage.deleteFriends(idUser, idFriends);
     }
 
     public List<User> findAllFriends(Integer idUser) {
-        List<User> friends = new ArrayList<>();
-        User user = findUserById(idUser);
-        if (user.getFriends() != null) {
-            for (Integer id : user.getFriends()) {
-                friends.add(findUserById(id));
-            }
-        }
-        return friends;
+        return userStorage.findAllFriends(idUser);
     }
 
     public List<User> findCommonFriends(int idUser, int idOther) {
-        List<User> commonFriends = new ArrayList<>();
-        User user = findUserById(idUser);
-        User otherUser = findUserById(idOther);
-        for (Integer friend : user.getFriends()) {
-            if (otherUser.getFriends().contains(friend)) {
-                commonFriends.add(findUserById(friend));
-            }
-        }
-        return commonFriends;
+        return userStorage.findCommonFriends(idUser, idOther);
     }
 
     private User findUserById(int id) {
