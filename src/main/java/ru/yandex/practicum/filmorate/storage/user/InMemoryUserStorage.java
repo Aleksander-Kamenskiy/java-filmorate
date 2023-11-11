@@ -50,16 +50,14 @@ public class InMemoryUserStorage implements UserStorage {
         return users.get(id);
     }
 
-    public void addFriends(int idUser, int idFriends) {
-        User user = findById(idUser);
-        User friend = findById(idFriends);
-        user.getFriends().add(idFriends);
-        friend.getFriends().add(idUser);
+    public void addFriends(User user, User friend) {
+        user.getFriends().add(friend.getId());
+        friend.getFriends().add(user.getId());
     }
 
-    public void deleteFriends(int idUser, int idFriends) {
-        findById(idUser).getFriends().remove(idFriends);
-        findById(idFriends).getFriends().remove(idUser);
+    public void deleteFriends(User user, User friend) {
+        user.getFriends().remove(friend.getId());
+        friend.getFriends().remove(user.getId());
     }
 
     public List<User> findAllFriends(Integer idUser) {
@@ -73,10 +71,8 @@ public class InMemoryUserStorage implements UserStorage {
         return friends;
     }
 
-    public List<User> findCommonFriends(int idUser, int idOther) {
+    public List<User> findCommonFriends(User user, User otherUser) {
         List<User> commonFriends = new ArrayList<>();
-        User user = findById(idUser);
-        User otherUser = findById(idOther);
         for (Integer friend : user.getFriends()) {
             if (otherUser.getFriends().contains(friend)) {
                 commonFriends.add(findById(friend));

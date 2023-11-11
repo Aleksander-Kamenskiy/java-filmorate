@@ -15,11 +15,11 @@ public interface UserStorage {
 
     User findById(Integer id);
 
-    void addFriends(int idUser, int idFriends);
+    void addFriends(User user, User friend);
 
-    void deleteFriends(int idUser, int idFriends);
+    void deleteFriends(User user, User friend);
 
     List<User> findAllFriends(Integer idUser);
 
-    List<User> findCommonFriends(int idUser, int idOther);
+    List<User> findCommonFriends(User user, User friend);
 }

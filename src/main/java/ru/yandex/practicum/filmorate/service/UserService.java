@@ -44,11 +44,27 @@ public class UserService {
     }
 
     public void addFriends(int idUser, int idFriends) {
-        userStorage.addFriends(idUser, idFriends);
+        User user = userStorage.findById(idUser);
+        User friend = userStorage.findById(idFriends);
+        if (user == null) {
+            throw new NotFoundException(String.format("Нет пользователя с id %s", idUser));
+        }
+        if (friend == null) {
+            throw new NotFoundException(String.format("Нет друга с id %s", idFriends));
+        }
+        userStorage.addFriends(user, friend);
     }
 
     public void deleteFriends(int idUser, int idFriends) {
-        userStorage.deleteFriends(idUser, idFriends);
+        User user = userStorage.findById(idUser);
+        User friend = userStorage.findById(idFriends);
+        if (user == null) {
+            throw new NotFoundException(String.format("Нет пользователя с id %s", idUser));
+        }
+        if (friend == null) {
+            throw new NotFoundException(String.format("Нет друга с id %s", idFriends));
+        }
+        userStorage.deleteFriends(user, friend);
     }
 
     public List<User> findAllFriends(Integer idUser) {
@@ -56,7 +72,15 @@ public class UserService {
     }
 
     public List<User> findCommonFriends(int idUser, int idOther) {
-        return userStorage.findCommonFriends(idUser, idOther);
+        User user = userStorage.findById(idUser);
+        User friend = userStorage.findById(idOther);
+        if (user == null) {
+            throw new NotFoundException(String.format("Нет пользователя с id %s", idUser));
+        }
+        if (friend == null) {
+            throw new NotFoundException(String.format("Нет друга с id %s", idOther));
+        }
+        return userStorage.findCommonFriends(user, friend);
     }
 
     private User findUserById(int id) {
