@@ -21,36 +21,60 @@ public class FilmValidatorTest {
 
     @Test
     void filmNameIsEmptyTest() throws ValidationException {
-        Film film = new Film("", "Description", LocalDate.of(2022, 10, 10), 90);
-
+        Film film = Film.builder()
+                .name("")
+                .description("description")
+                .releaseDate(LocalDate.of(2022, 10, 10))
+                .duration(90)
+                .build();
         assertThrows(ValidationException.class, () -> filmValidator.validate(film));
 
     }
 
     @Test
     void filmDescriptionLenght201Test() throws ValidationException {
-        Film film = new Film("Name", "A".repeat(201), LocalDate.of(2022, 10, 10), 90);
+        Film film = Film.builder()
+                .name("Name")
+                .description("A".repeat(201))
+                .releaseDate(LocalDate.of(2022, 10, 10))
+                .duration(90)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmValidator.validate(film));
     }
 
     @Test
     public void filmDescriptionLenght200Test() throws ValidationException {
-        Film film = new Film("Name", "A".repeat(200), LocalDate.of(2022, 10, 10), 90);
+        Film film = Film.builder()
+                .name("Name")
+                .description("A".repeat(200))
+                .releaseDate(LocalDate.of(2022, 10, 10))
+                .duration(90)
+                .build();
 
         filmValidator.validate(film);
     }
 
     @Test
     void filmReleaseDateTest() throws ValidationException {
-        Film film = new Film("Name", "Description", LocalDate.of(1895, 12, 27), 90);
+        Film film = Film.builder()
+                .name("Name")
+                .description("Description")
+                .releaseDate(LocalDate.of(1895, 12, 27))
+                .duration(90)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmValidator.validate(film));
     }
 
     @Test
     void filmDurationTest() throws ValidationException {
-        Film film = new Film("Name", "Description", LocalDate.of(1895, 12, 29), -1);
+        Film film = Film.builder()
+                .name("Name")
+                .description("Description")
+                .releaseDate(LocalDate.of(1895, 12, 27))
+                .duration(-1)
+                .build();
 
         assertThrows(ValidationException.class, () -> filmValidator.validate(film));
     }

@@ -40,9 +40,9 @@ public class FilmController {
     }
 
     @GetMapping(value = "/films/{id}")
-    public Film getFilms(@PathVariable Integer id) {
+    public Film getFilms(@PathVariable int id) {
         log.info("Получение фильма");
-        Film getFilm = filmService.getFilm(id);
+        Film getFilm = filmService.findById(id);
         log.info("Фильм получен " + getFilm.getId());
         return getFilm;
     }
@@ -50,29 +50,29 @@ public class FilmController {
     @GetMapping(value = "/films")
     public Collection<Film> getAll() {
         log.info("Получение фильмов");
-        Collection<Film> getAllFilms = filmService.getAll();
+        Collection<Film> getAllFilms = filmService.findAll();
         log.info("Все фильмы получены " + getAllFilms);
         return getAllFilms;
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")
-    public void likeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+    public void likeFilm(@PathVariable int id, @PathVariable int userId) {
         log.info("Получение лайка");
         filmService.addLike(id, userId);
         log.info("Лайк получен");
     }
 
     @DeleteMapping(value = "/films/{id}/like/{userId}")
-    public void deleteLikeFilm(@PathVariable Integer id, @PathVariable Integer userId) {
+    public void deleteLikeFilm(@PathVariable int id, @PathVariable int userId) {
         log.info("Удаление лайка");
         filmService.deleteLike(id, userId);
         log.info("Лайк удален");
     }
 
     @GetMapping(value = "/films/popular")
-    public Collection<Film> bestFilms(@RequestParam(name = "count", defaultValue = "10", required = false) Integer count) {
+    public Collection<Film> getPopular(@RequestParam(name = "count", defaultValue = "10", required = false) Integer count) {
         log.info("Получение популярных фильмов");
-        List<Film> bestsFilms = filmService.bestFilmByLike(count);
+        List<Film> bestsFilms = filmService.getPopular(count);
         log.info("Все фильмы получены " + bestsFilms.size());
         return bestsFilms;
     }
