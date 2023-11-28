@@ -3,8 +3,11 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.Collection;
@@ -75,5 +78,29 @@ public class FilmController {
         List<Film> bestsFilms = filmService.getPopular(count);
         log.info("Все фильмы получены " + bestsFilms.size());
         return bestsFilms;
+    }
+
+    @GetMapping("/genres")
+    public ResponseEntity<List<Genre>> findAllGenre() {
+        List<Genre> genres = filmService.findAllGenre();
+        return ResponseEntity.ok().body(genres);
+    }
+
+    @GetMapping("/genres/{id}")
+    public ResponseEntity<Genre> findGenreById(@PathVariable int id) {
+        Genre genre = filmService.findGenreById(id);
+        return ResponseEntity.ok().body(genre);
+    }
+
+    @GetMapping("/mpa")
+    public ResponseEntity<List<Mpa>> getAllMpa() {
+        List<Mpa> mpaList = filmService.getAllMpa();
+        return ResponseEntity.ok().body(mpaList);
+    }
+
+    @GetMapping("/mpa/{id}")
+    public ResponseEntity<Mpa> findMpaById(@PathVariable int id) {
+        Mpa mpa = filmService.findMpaById(id);
+        return ResponseEntity.ok().body(mpa);
     }
 }

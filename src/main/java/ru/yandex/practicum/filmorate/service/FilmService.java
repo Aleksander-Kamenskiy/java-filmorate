@@ -5,8 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.likes.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
 
@@ -17,58 +16,86 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
-    private final LikeStorage likeStorage;
-    private final GenreStorage genreStorage;
+
+    private final UserStorage userStorage;
 
     FilmValidator validator = new FilmValidator();
 
     public List<Film> findAll() {
         List<Film> filmList = filmStorage.findAll();
-        filmList.forEach(film -> film.setGenres(genreStorage.findGenresByFilmId(film.getId())));
+
         return filmList;
     }
 
     public Film findById(Integer id) {
-        Film film = filmStorage.findById(id).orElseThrow(() -> new NotFoundException("Film does not exist"));
-        film.setGenres(genreStorage.findGenresByFilmId(film.getId()));
+        Film film = filmStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм не существует"));
         return film;
     }
 
+    public User findUserById(Integer id) {
+        return userStorage.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+    }
+
     public Film create(Film film) {
+        checkGenre(film);
         validator.validate(film);
-        Film createdFilm = filmStorage.create(film).orElseThrow(() -> new NotFoundException("Film not created"));
-        if (film.getGenres() != null) {
-            genreStorage.filmGenreBatchUpdate(createdFilm.getId(), film.getGenres());
-        }
-        createdFilm.setGenres(genreStorage.findGenresByFilmId(createdFilm.getId()));
+        Film createdFilm = filmStorage.createdFilm(film);
         return createdFilm;
     }
 
-    public Film update(Film film) {
-        Integer id = film.getId();
-        findById(id);
-        validator.validateUpdate(film);
-        Film updatedFilm = filmStorage.update(film).orElseThrow(() -> new NotFoundException("Film not updated"));
-        genreStorage.deleteGenreByFilmId(id);
-        if (film.getGenres() != null) {
-            genreStorage.filmGenreBatchUpdate(id, film.getGenres());
+    private void checkGenre(Film film) {
+        if (film.getGenres() == null) {
+            return;
         }
-        updatedFilm.setGenres(genreStorage.findGenresByFilmId(id));
-        return updatedFilm;
+        HashSet<Integer> genreIds = new HashSet<>();
+        for (Genre genre : filmStorage.findAllGenre()) {
+            genreIds.add(genre.getId());
+        }
+        for (Genre genre : film.getGenres()) {
+            if (!genreIds.contains(genre.getId())) {
+                throw new NotFoundException("Жанр не найден");
+            }
+        }
     }
 
-    public Like addLike(Integer filmId, Integer userId) {
-        Optional<Like> filmLike = likeStorage.findFilmLikeByUserIdFilmId(userId, filmId);
-        return filmLike.orElseGet(() -> likeStorage.createFilmLike(userId, filmId).orElseThrow(() -> new NotFoundException("Like not added")));
+    public Film update(Film film) {
+        validator.validateUpdate(film);
+        findById(film.getId());
+        filmStorage.update(film);
+        return film;
     }
 
-    public Like deleteLike(Integer filmId, Integer userId) {
-        return likeStorage.deleteFilmLike(userId, filmId).orElseThrow(() -> new NotFoundException("Like does not exist"));
+    public void addLike(Integer filmId, Integer userId) {
+        Film film = findById(filmId);
+        User user = findUserById(userId);
+        filmStorage.createLike(user, film);
+    }
+
+    public void deleteLike(Integer filmId, Integer userId) {
+        Film film = findById(filmId);
+        User user = findUserById(userId);
+        filmStorage.deleteLike(user, film);
     }
 
     public List<Film> getPopular(int count) {
         List<Film> filmList = filmStorage.getPopular(count);
-        filmList.forEach(film -> film.setGenres(genreStorage.findGenresByFilmId(film.getId())));
         return filmList;
+    }
+
+    public List<Genre> findAllGenre() {
+        return filmStorage.findAllGenre();
+    }
+
+    public Genre findGenreById(Integer id) {
+        return filmStorage.findGenreById(id).orElseThrow(() -> new NotFoundException("Жанр не найден"));
+    }
+
+    public List<Mpa> getAllMpa() {
+        return filmStorage.findAllMpa();
+    }
+
+    public Mpa findMpaById(int id) {
+        Optional<Mpa> mpa = filmStorage.findMpaById(id);
+        return mpa.orElseThrow(() -> new NotFoundException("Рейтинг MPA с id " + id + " не найден"));
     }
 }

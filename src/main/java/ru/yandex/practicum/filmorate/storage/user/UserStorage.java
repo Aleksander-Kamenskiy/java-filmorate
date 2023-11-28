@@ -12,8 +12,14 @@ public interface UserStorage {
 
     User create(User user);
 
-    User update(User user);
+    void update(User user);
 
-    Optional<User> deleteById(Integer id);
+    void deleteFriend(User user, User friend);
+
+    List<User> getFriends(User user);
+
+    List<User> getCommonFriends(User user1, User user2);
+
+    void addFriend(User user, User friend);
 
 }

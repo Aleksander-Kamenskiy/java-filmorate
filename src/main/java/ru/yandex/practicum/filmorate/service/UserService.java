@@ -5,23 +5,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
-import ru.yandex.practicum.filmorate.model.Friends;
-
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.friend.FriendStorage;
 
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
-    private final FriendStorage friendStorage;
 
     UserValidator validator = new UserValidator();
 
@@ -30,7 +24,7 @@ public class UserService {
     }
 
     public User findById(Integer id) {
-        return userStorage.findById(id).orElseThrow(() -> new NotFoundException("User does not exist"));
+        return userStorage.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
     public User create(User user) {
@@ -43,41 +37,31 @@ public class UserService {
         setUserName(user);
         validator.validateUpdate(user);
         findById(user.getId());
-        return userStorage.update(user);
+        userStorage.update(user);
+        return user;
     }
 
-    public Friends addFriend(Integer id, Integer friendId) {
-        findById(id);
-        findById(friendId);
-        Optional<Friends> friends = friendStorage.findFriendsByUserIds(id, friendId);
-        return friends.orElseGet(() -> friendStorage.create(Friends.builder()
-                .id(0)
-                .userId1(id)
-                .userId2(friendId)
-                .statusId(1)
-                .build()));
+    public void addFriend(Integer id, Integer friendId) {
+        User user = findById(id);
+        User friend = findById(friendId);
+        userStorage.addFriend(user, friend);
     }
 
-    public Friends deleteFriend(Integer id, Integer friendId) {
-        findById(id);
-        findById(friendId);
-        friendStorage.findFriendsByUserIds(id, friendId);
-        return friendStorage.delete(id, friendId).orElseThrow(() -> new NotFoundException("Friendsdoes not exist"));
+    public void deleteFriend(Integer id, Integer friendId) {
+        User user = findById(id);
+        User friend = findById(friendId);
+        userStorage.deleteFriend(user, friend);
     }
 
     public List<User> getFriends(Integer id) {
-        findById(id);
-        return friendStorage.getFriendIdsByUserId(id).stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
+        User user = findById(id);
+        return userStorage.getFriends(user);
     }
 
     public List<User> getCommonFriends(Integer id, Integer friendId) {
-        findById(id);
-        findById(friendId);
-        return friendStorage.getCommonFriendIdsByUserIds(id, friendId).stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
+        User user = findById(id);
+        User friend = findById(friendId);
+        return userStorage.getCommonFriends(user, friend);
     }
 
     private void setUserName(User user) {
