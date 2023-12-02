@@ -23,18 +23,4 @@ public interface FilmStorage {
 
     void deleteLike(User user, Film film);
 
-    List<Genre> findAllGenre();
-
-    Optional<Genre> findGenreById(Integer id);
-
-    List<Genre> findGenresByFilmId(Integer filmId);
-
-    void filmGenreBatchUpdate(Integer filmId, List<Genre> genreList);
-
-    void deleteGenreByFilmId(Integer filmId);
-
-    List<Mpa> findAllMpa();
-
-    Optional<Mpa> findMpaById(Integer id);
-
 }

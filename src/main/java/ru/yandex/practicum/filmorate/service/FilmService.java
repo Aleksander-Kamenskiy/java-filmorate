@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.FilmValidator;
 
@@ -18,6 +19,8 @@ public class FilmService {
     private final FilmStorage filmStorage;
 
     private final UserStorage userStorage;
+
+    private final GenreStorage genreStorage;
 
     FilmValidator validator = new FilmValidator();
 
@@ -48,7 +51,7 @@ public class FilmService {
             return;
         }
         HashSet<Integer> genreIds = new HashSet<>();
-        for (Genre genre : filmStorage.findAllGenre()) {
+        for (Genre genre : genreStorage.findAllGenre()) {
             genreIds.add(genre.getId());
         }
         for (Genre genre : film.getGenres()) {
@@ -80,22 +83,5 @@ public class FilmService {
     public List<Film> getPopular(int count) {
         List<Film> filmList = filmStorage.getPopular(count);
         return filmList;
-    }
-
-    public List<Genre> findAllGenre() {
-        return filmStorage.findAllGenre();
-    }
-
-    public Genre findGenreById(Integer id) {
-        return filmStorage.findGenreById(id).orElseThrow(() -> new NotFoundException("Жанр не найден"));
-    }
-
-    public List<Mpa> getAllMpa() {
-        return filmStorage.findAllMpa();
-    }
-
-    public Mpa findMpaById(int id) {
-        Optional<Mpa> mpa = filmStorage.findMpaById(id);
-        return mpa.orElseThrow(() -> new NotFoundException("Рейтинг MPA с id " + id + " не найден"));
     }
 }
