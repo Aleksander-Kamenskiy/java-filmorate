@@ -50,6 +50,9 @@ public class FilmService {
         if (film.getGenres() == null) {
             return;
         }
+        if (genreStorage.findAllGenre().equals(film.getGenres())) {
+            return;
+        }
         HashSet<Integer> genreIds = new HashSet<>();
         for (Genre genre : genreStorage.findAllGenre()) {
             genreIds.add(genre.getId());
@@ -63,7 +66,7 @@ public class FilmService {
 
     public Film update(Film film) {
         validator.validateUpdate(film);
-        findById(film.getId());
+        filmStorage.findById(film.getId()).orElseThrow(() -> new NotFoundException("Фильм не существует"));
         filmStorage.update(film);
         return film;
     }

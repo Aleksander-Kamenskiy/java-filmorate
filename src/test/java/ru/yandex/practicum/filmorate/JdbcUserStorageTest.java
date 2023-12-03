@@ -7,7 +7,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.JdbcUserStorage;
 
 
 import java.time.LocalDate;
@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class UserDbStorageTest {
+class JdbcUserStorageTest {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Test
@@ -31,7 +31,7 @@ class UserDbStorageTest {
                 .email("mail2@mail.ru")
                 .birthday(LocalDate.of(1946, 8, 20))
                 .build();
-        UserDbStorage userStorage = new UserDbStorage(namedParameterJdbcTemplate);
+        JdbcUserStorage userStorage = new JdbcUserStorage(namedParameterJdbcTemplate);
         User newUser = userStorage.create(user);
         int id = newUser.getId();
 
@@ -52,7 +52,7 @@ class UserDbStorageTest {
                 .birthday(LocalDate.of(1946, 8, 20))
                 .build();
 
-        UserDbStorage userStorage = new UserDbStorage(namedParameterJdbcTemplate);
+        JdbcUserStorage userStorage = new JdbcUserStorage(namedParameterJdbcTemplate);
         User newUser = userStorage.create(user);
         newUser.setName("Kykes name");
         userStorage.update(newUser);
@@ -62,7 +62,7 @@ class UserDbStorageTest {
 
     @Test
     public void testFindAllUsers() {
-        UserDbStorage userStorage = new UserDbStorage(namedParameterJdbcTemplate);
+        JdbcUserStorage userStorage = new JdbcUserStorage(namedParameterJdbcTemplate);
         User user = User.builder()
                 .name("Nick Name1")
                 .email("1mail@mail.ru")
@@ -82,7 +82,7 @@ class UserDbStorageTest {
 
     @Test
     public void testAddAndDeleteFriend() {
-        UserDbStorage userStorage = new UserDbStorage(namedParameterJdbcTemplate);
+        JdbcUserStorage userStorage = new JdbcUserStorage(namedParameterJdbcTemplate);
         User user1 = User.builder()
                 .name("Nick")
                 .email("1mail@mail.ru")

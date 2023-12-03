@@ -13,11 +13,11 @@ import java.sql.SQLException;
 import java.util.*;
 
 @Repository
-public class UserDbStorage implements UserStorage {
+public class JdbcUserStorage implements UserStorage {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Autowired
-    public UserDbStorage(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public JdbcUserStorage(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 

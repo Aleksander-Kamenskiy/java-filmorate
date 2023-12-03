@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class MpaDbStorage implements MpaStorage {
+public class JdbcMpaStorage implements MpaStorage {
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     @Autowired
-    public MpaDbStorage(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public JdbcMpaStorage(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 

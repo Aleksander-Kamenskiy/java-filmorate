@@ -10,34 +10,34 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.genre.GenreMapper;
+import ru.yandex.practicum.filmorate.storage.genre.GenreRowMapper;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository
-public class FilmDbStorage implements FilmStorage {
+public class JdbcFilmStorage implements FilmStorage {
 
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
 
     private static ResultSetExtractor<List<Film>> filmExtractor = rs -> {
-        List<Film> filmList = new ArrayList<>();
-        Film film = null;
+        GenreRowMapper genreRowMapper = new GenreRowMapper();
+        HashMap<Integer, Film> filmMap = new HashMap<>();
         while (rs.next()) {
             int filmId = rs.getInt("film_id");
-            if (film == null || filmId != film.getId()) {
+            Film film = filmMap.getOrDefault(filmId, null);
+            if (film == null) {
                 film = mapRowToFilm(rs);
-                film.setGenres(new ArrayList<>());
-                filmList.add(film);
+                film.setGenres(new TreeSet<>(Comparator.comparing(genre -> genre.getId())));
+                filmMap.put(filmId, film);
             }
             if (rs.getInt("genre_id") != 0) {
-                film.getGenres().add(GenreMapper.mapRowToGenre(rs));
+                film.getGenres().add(genreRowMapper.mapRow(rs, rs.getRow()));
             }
         }
-        return filmList;
+        return new ArrayList<>(filmMap.values());
     };
 
     private static Film mapRowToFilm(ResultSet rs) throws SQLException {
@@ -57,7 +57,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Autowired
-    public FilmDbStorage(NamedParameterJdbcTemplate namedJdbcTemplate) {
+    public JdbcFilmStorage(NamedParameterJdbcTemplate namedJdbcTemplate) {
         this.namedJdbcTemplate = namedJdbcTemplate;
     }
 
@@ -106,24 +106,27 @@ public class FilmDbStorage implements FilmStorage {
         return film;
     }
 
-    private void filmGenreBatchUpdate(Film film, List<Genre> genreList) {
-        if (genreList == null) {
-            film.setGenres(new ArrayList<>());
+    private void filmGenreBatchUpdate(Film film, Set<Genre> genreSet) {
+        if (genreSet == null) {
+            film.setGenres(new TreeSet<>());
             return;
         }
-        deleteGenreByFilmId(film.getId());
-        List<Genre> listWithoutDuplicates = genreList.stream().distinct().collect(Collectors.toList());
-        film.setGenres(listWithoutDuplicates);
+        TreeSet<Genre> genreTreeSet = new TreeSet<Genre>(Comparator.comparing(genre -> genre.getId()));
+        for (Genre genre : genreSet) {
+            genreTreeSet.add(genre);
+        }
+        film.setGenres(genreTreeSet);
+        List<Genre> genreList = new ArrayList<>(genreSet);
         namedJdbcTemplate.getJdbcTemplate().batchUpdate(
                 "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)",
                 new BatchPreparedStatementSetter() {
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
                         ps.setInt(1, film.getId());
-                        ps.setInt(2, listWithoutDuplicates.get(i).getId());
+                        ps.setInt(2, genreList.get(i).getId());
                     }
 
                     public int getBatchSize() {
-                        return listWithoutDuplicates.size();
+                        return genreList.size();
                     }
                 });
     }
@@ -145,6 +148,7 @@ public class FilmDbStorage implements FilmStorage {
         parameters.addValue("rating_mpa_id", film.getMpa().getId());
         parameters.addValue("film_id", film.getId());
         namedJdbcTemplate.update(qs, parameters);
+        deleteGenreByFilmId(film.getId());
         filmGenreBatchUpdate(film, film.getGenres());
     }
 
@@ -186,8 +190,10 @@ public class FilmDbStorage implements FilmStorage {
         final String qs = "MERGE INTO likes (user_id, film_id) values (:user_id, :film_id)";
         MapSqlParameterSource parameters = new MapSqlParameterSource("user_id", user.getId());
         parameters.addValue("film_id", film.getId());
-        namedJdbcTemplate.update(qs, parameters);
-        rateUpdate(film.getId());
+        int res = namedJdbcTemplate.update(qs, parameters);
+        if (res > 0) {
+            rateUpdate(film.getId());
+        }
     }
 
     @Override
@@ -195,8 +201,10 @@ public class FilmDbStorage implements FilmStorage {
         final String qs = "DELETE FROM likes WHERE user_id = :user_id and film_id = :film_id";
         MapSqlParameterSource parameters = new MapSqlParameterSource("user_id", user.getId());
         parameters.addValue("film_id", film.getId());
-        namedJdbcTemplate.update(qs, parameters);
-        rateUpdate(film.getId());
+        int res = namedJdbcTemplate.update(qs, parameters);
+        if (res > 0) {
+            rateUpdate(film.getId());
+        }
     }
 
 

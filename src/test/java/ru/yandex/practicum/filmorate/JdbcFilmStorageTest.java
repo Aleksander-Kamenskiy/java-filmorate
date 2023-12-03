@@ -7,9 +7,9 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.*;
-import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.JdbcFilmStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.JdbcUserStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-class FilmDbStorageTest {
+class JdbcFilmStorageTest {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private Film createFilm(FilmStorage filmStorage) {
@@ -54,7 +54,7 @@ class FilmDbStorageTest {
 
     @Test
     public void testFindFilmById() {
-        FilmStorage filmStorage = new FilmDbStorage(namedParameterJdbcTemplate);
+        FilmStorage filmStorage = new JdbcFilmStorage(namedParameterJdbcTemplate);
         Film newFilm = createFilm(filmStorage);
         int id = newFilm.getId();
         Film savedFilm = filmStorage.findById(id).orElseThrow(() -> new NotFoundException("Фильм с указанным id не найден: " + id));
@@ -67,7 +67,7 @@ class FilmDbStorageTest {
 
     @Test
     public void testUpdateFilm() {
-        FilmStorage filmStorage = new FilmDbStorage(namedParameterJdbcTemplate);
+        FilmStorage filmStorage = new JdbcFilmStorage(namedParameterJdbcTemplate);
 
         Film newFilm = createFilm(filmStorage);
 
@@ -93,7 +93,7 @@ class FilmDbStorageTest {
 
     @Test
     public void testFindAllFilms() {
-        FilmStorage filmStorage = new FilmDbStorage(namedParameterJdbcTemplate);
+        FilmStorage filmStorage = new JdbcFilmStorage(namedParameterJdbcTemplate);
         Film newFilm = createFilm(filmStorage);
         Film newFilm2 = createFilm(filmStorage);
 
@@ -102,7 +102,7 @@ class FilmDbStorageTest {
 
     @Test
     public void testDeleteFilm() {
-        FilmStorage filmStorage = new FilmDbStorage(namedParameterJdbcTemplate);
+        FilmStorage filmStorage = new JdbcFilmStorage(namedParameterJdbcTemplate);
         Film newFilm = createFilm(filmStorage);
         filmStorage.deleteFilmById(newFilm.getId());
 
@@ -111,11 +111,11 @@ class FilmDbStorageTest {
 
     @Test
     public void testGetPopularFilm() {
-        FilmStorage filmStorage = new FilmDbStorage(namedParameterJdbcTemplate);
+        FilmStorage filmStorage = new JdbcFilmStorage(namedParameterJdbcTemplate);
         Film newFilm = createFilm(filmStorage);
         Film newFilm2 = createFilm(filmStorage);
 
-        UserDbStorage userStorage = new UserDbStorage(namedParameterJdbcTemplate);
+        JdbcUserStorage userStorage = new JdbcUserStorage(namedParameterJdbcTemplate);
         User newUser = createUser(userStorage);
         filmStorage.createLike(newUser, newFilm2);
 
@@ -127,9 +127,9 @@ class FilmDbStorageTest {
 
     @Test
     public void testDeleteLike() {
-        FilmStorage filmStorage = new FilmDbStorage(namedParameterJdbcTemplate);
+        FilmStorage filmStorage = new JdbcFilmStorage(namedParameterJdbcTemplate);
         Film newFilm = createFilm(filmStorage);
-        UserDbStorage userStorage = new UserDbStorage(namedParameterJdbcTemplate);
+        JdbcUserStorage userStorage = new JdbcUserStorage(namedParameterJdbcTemplate);
         User newUser = createUser(userStorage);
 
         filmStorage.createLike(newUser, newFilm);
