@@ -16,7 +16,7 @@ import java.util.Optional;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-public class MpaDbStorageTest {
+public class JdbcMpaStorageTest {
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     @Test

@@ -50,17 +50,9 @@ public class FilmService {
         if (film.getGenres() == null) {
             return;
         }
-        if (genreStorage.findAllGenre().equals(film.getGenres())) {
-            return;
-        }
-        HashSet<Integer> genreIds = new HashSet<>();
-        for (Genre genre : genreStorage.findAllGenre()) {
-            genreIds.add(genre.getId());
-        }
-        for (Genre genre : film.getGenres()) {
-            if (!genreIds.contains(genre.getId())) {
-                throw new NotFoundException("Жанр не найден");
-            }
+        Set<Genre> foundGenres = genreStorage.findGenreByIds(film.getGenres());
+        if (foundGenres.size() != film.getGenres().size()) {
+            throw new NotFoundException("Жанр не найден");
         }
     }
 
