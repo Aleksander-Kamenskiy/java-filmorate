@@ -1,3 +1,4 @@
+
 package ru.yandex.practicum.filmorate.validator;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -20,51 +21,78 @@ public class UserValidatorTest {
 
     @Test
     public void createUserTest() throws ValidationException {
-        User user = new User("@Email", "login", "name", LocalDate.of(2010, 10, 10));
-
+        User user = User.builder()
+                .email("@Email")
+                .login("login")
+                .name("name")
+                .birthday(LocalDate.of(2010, 10, 10))
+                .build();
         userValidator.validate(user);
     }
 
     @Test
     public void userEmailTest() throws ValidationException {
-        User user = new User("", "login", "name", LocalDate.of(2010, 10, 10));
-
+        User user = User.builder()
+                .email("")
+                .login("login")
+                .name("name")
+                .birthday(LocalDate.of(2010, 10, 10))
+                .build();
         assertThrows(ValidationException.class, () -> userValidator.validate(user));
     }
 
     @Test
     public void userEmailTest2() throws ValidationException {
-        User user = new User("email", "login", "name", LocalDate.of(2010, 10, 10));
-
+        User user = User.builder()
+                .email("email")
+                .login("login")
+                .name("name")
+                .birthday(LocalDate.of(2010, 10, 10))
+                .build();
         assertThrows(ValidationException.class, () -> userValidator.validate(user));
     }
 
     @Test
     public void userLoginTest() throws ValidationException {
-        User user = new User("@email", "", "name", LocalDate.of(2010, 10, 10));
-
+        User user = User.builder()
+                .email("@email")
+                .login("")
+                .name("name")
+                .birthday(LocalDate.of(2010, 10, 10))
+                .build();
         assertThrows(ValidationException.class, () -> userValidator.validate(user));
     }
 
     @Test
     public void userLoginTest2() throws ValidationException {
-        User user = new User("@email", " lgn ", "name", LocalDate.of(2010, 10, 10));
-
+        User user = User.builder()
+                .email("@email")
+                .login(" lgn ")
+                .name("name")
+                .birthday(LocalDate.of(2010, 10, 10))
+                .build();
         assertThrows(ValidationException.class, () -> userValidator.validate(user));
     }
 
     @Test
     public void createNameTest() throws ValidationException {
-        User user = new User("@Email", "login", "", LocalDate.of(2010, 10, 10));
-
+        User user = User.builder()
+                .email("@Email")
+                .login("login")
+                .name("")
+                .birthday(LocalDate.of(2010, 10, 10))
+                .build();
         userValidator.validate(user);
     }
 
     @Test
     public void userBirthdayTest() throws ValidationException {
-        User user = new User("@Email", "login", "name", LocalDate.now().plusDays(1));
-
+        User user = User.builder()
+                .email("@Email")
+                .login("login")
+                .name("name")
+                .birthday(LocalDate.now().plusDays(1))
+                .build();
         assertThrows(ValidationException.class, () -> userValidator.validate(user));
     }
 }
-

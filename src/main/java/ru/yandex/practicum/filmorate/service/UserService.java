@@ -1,94 +1,67 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+
 import ru.yandex.practicum.filmorate.model.User;
+
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validator.UserValidator;
 
-import java.util.Collection;
 import java.util.List;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
 
     UserValidator validator = new UserValidator();
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public List<User> findAll() {
+        return userStorage.findAll();
     }
 
-    public Collection<User> getAll() {
-        return userStorage.getAll();
+    public User findById(Integer id) {
+        return userStorage.findById(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
     }
 
     public User create(User user) {
         setUserName(user);
         validator.validate(user);
-        return userStorage.add(user);
+        return userStorage.create(user);
     }
 
     public User update(User user) {
         setUserName(user);
         validator.validateUpdate(user);
-        return userStorage.update(user);
-    }
-
-    public User getUser(int idUser) {
-        return findUserById(idUser);
-    }
-
-    public void addFriends(int idUser, int idFriends) {
-        User user = userStorage.findById(idUser);
-        User friend = userStorage.findById(idFriends);
-        if (user == null) {
-            throw new NotFoundException(String.format("Нет пользователя с id %s", idUser));
-        }
-        if (friend == null) {
-            throw new NotFoundException(String.format("Нет друга с id %s", idFriends));
-        }
-        userStorage.addFriends(user, friend);
-    }
-
-    public void deleteFriends(int idUser, int idFriends) {
-        User user = userStorage.findById(idUser);
-        User friend = userStorage.findById(idFriends);
-        if (user == null) {
-            throw new NotFoundException(String.format("Нет пользователя с id %s", idUser));
-        }
-        if (friend == null) {
-            throw new NotFoundException(String.format("Нет друга с id %s", idFriends));
-        }
-        userStorage.deleteFriends(user, friend);
-    }
-
-    public List<User> findAllFriends(Integer idUser) {
-        return userStorage.findAllFriends(idUser);
-    }
-
-    public List<User> findCommonFriends(int idUser, int idOther) {
-        User user = userStorage.findById(idUser);
-        User friend = userStorage.findById(idOther);
-        if (user == null) {
-            throw new NotFoundException(String.format("Нет пользователя с id %s", idUser));
-        }
-        if (friend == null) {
-            throw new NotFoundException(String.format("Нет друга с id %s", idOther));
-        }
-        return userStorage.findCommonFriends(user, friend);
-    }
-
-    private User findUserById(int id) {
-        User user = userStorage.findById(id);
-        if (user == null) {
-            throw new NotFoundException(String.format("Нет пользователя с id %s", id));
-        }
+        findById(user.getId());
+        userStorage.update(user);
         return user;
+    }
+
+    public void addFriend(Integer id, Integer friendId) {
+        User user = findById(id);
+        User friend = findById(friendId);
+        userStorage.addFriend(user, friend);
+    }
+
+    public void deleteFriend(Integer id, Integer friendId) {
+        User user = findById(id);
+        User friend = findById(friendId);
+        userStorage.deleteFriend(user, friend);
+    }
+
+    public List<User> getFriends(Integer id) {
+        User user = findById(id);
+        return userStorage.getFriends(user);
+    }
+
+    public List<User> getCommonFriends(Integer id, Integer friendId) {
+        User user = findById(id);
+        User friend = findById(friendId);
+        return userStorage.getCommonFriends(user, friend);
     }
 
     private void setUserName(User user) {
